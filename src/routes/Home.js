@@ -1,9 +1,11 @@
 import React,{useState, useEffect, useRef} from "react";
-import { dbService } from "../fbase";
+import { dbService, storageService } from "../fbase";
 import { addDoc, collection,serverTimestamp,onSnapshot,
     orderBy,
     query}  from "firebase/firestore";
 import Nweet from '../components/Nweet';
+import { ref, uploadString } from "firebase/storage";
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -33,14 +35,16 @@ const Home = ({userObj})=>{
 
     const onSubmit =async (e) => {
         e.preventDefault();
-        console.log(`서브밋 하는 느윗:${nweet}`);
-        await addDoc(collection(dbService, "nweets"), {
-        text:nweet,
-        createdAt: serverTimestamp(),
-        creatorId: userObj.uid,
-        });
-        setNweet("");
-        };
+        const fileRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
+        const response = await uploadString(fileRef, attachment, "data_url");
+        console.log(response);
+        // await addDoc(collection(dbService, "nweets"), {
+        // text:nweet,
+        // createdAt: serverTimestamp(),
+        // creatorId: userObj.uid,
+        // });
+        // setNweet("");
+    };
 
 
     const onChange = (ev)=>{
