@@ -3,26 +3,15 @@ import { dbService } from "../fbase";
 import { addDoc, collection,serverTimestamp,onSnapshot,
     orderBy,
     query}  from "firebase/firestore";
+import Nweet from '../components/Nweet';
 
 
 const Home = ({userObj})=>{
     const [nweet, setNweet] = useState("");
     const [nweets, setNweets] = useState([]);
-    // const getNweets = async ()=>{
-    //     const dbNweets = query(collection(dbService, "nweets"));
-    //     const querySnapshot = await getDocs(dbNweets);
-    //     querySnapshot.forEach((doc) => {
-    //         const nweetObj = {
-    //             ...doc.data(),
-    //             id: doc.id,
-    //         }
-    //         setNweets(prev => [nweetObj, ...prev]);
-    //     });
-    // }
-
 
     useEffect(() => {
-     const q = query(collection(dbService, "nweets"),orderBy('createdAt',"desc"));
+     const q = query(collection(dbService, "nweets"), orderBy("createdAt", "desc"));
      const unsubscribe = 
      onSnapshot(q, (snapshot)=>{
          const nweetArr = snapshot.docs.map((doc)=>({
@@ -67,9 +56,9 @@ console.log(nweets);
 
             <div>
                 {nweets.map((nweet) =>(
-                    <div key={nweet.id}>
-                        <h4>{nweet.text}</h4>
-                    </div>))}
+                    <Nweet key={nweet.id} nweetObj ={nweet} isOwner={nweet.creatorId ===userObj.uid}/>
+                    )
+                )}
             </div>
             
         </div>
