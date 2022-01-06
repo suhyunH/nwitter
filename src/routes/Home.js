@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from "react";
+import React,{useState, useEffect, useRef} from "react";
 import { dbService } from "../fbase";
 import { addDoc, collection,serverTimestamp,onSnapshot,
     orderBy,
@@ -6,9 +6,13 @@ import { addDoc, collection,serverTimestamp,onSnapshot,
 import Nweet from '../components/Nweet';
 
 
+
 const Home = ({userObj})=>{
+    //hook must be on the top of the fuction
     const [nweet, setNweet] = useState("");
     const [nweets, setNweets] = useState([]);
+    const [attachment, setAttachment] = useState();
+    const fileInput =useRef();
 
     useEffect(() => {
      const q = query(collection(dbService, "nweets"), orderBy("createdAt", "desc"));
@@ -46,12 +50,36 @@ const Home = ({userObj})=>{
         setNweet(value);
     };
 
+    const onFileChange=(ev)=>{
+        const {target:{files}} =ev;
+        const theFile = files[0];
+        const reader = new FileReader();
+        reader.onloadend=(finishedEv)=>{
+            // const{currentTarget:{result}} = finishedEv;
+            // setAttachment(result);
+            setAttachment(finishedEv.currentTarget.result);
+        };
+        reader.readAsDataURL(theFile);
+    };
+    
+    const onClearAttachment = ()=>{
+        setAttachment(null);
+        fileInput.current.value ="";
+
+    }
+
 console.log(nweets);
     return (
         <div>
             <form onSubmit={onSubmit}>
                 <input value={nweet} type="text" onChange={onChange} placeholder="What's on your mind?" maxLength={120}/>
+                <input ref={fileInput} type="file" accept='image/*' onChange={onFileChange}/>
                 <input type="submit" value="Nweet"/>
+                {attachment &&<div> 
+                    <img src={attachment} width="50px" height="50px" />
+                    <button onClick={onClearAttachment}>Clear</button>
+                    </div>
+                }
             </form>
 
             <div>
