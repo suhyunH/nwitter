@@ -1,10 +1,10 @@
 import React,{useState, useEffect, useRef} from "react";
 import { dbService, storageService } from "../fbase";
-import { addDoc, collection,serverTimestamp,onSnapshot,
+import { addDoc, collection,serverTimestamp, onSnapshot,
     orderBy,
     query}  from "firebase/firestore";
 import Nweet from '../components/Nweet';
-import { ref, uploadString } from "firebase/storage";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -13,7 +13,7 @@ const Home = ({userObj})=>{
     //hook must be on the top of the fuction
     const [nweet, setNweet] = useState("");
     const [nweets, setNweets] = useState([]);
-    const [attachment, setAttachment] = useState();
+    const [attachment, setAttachment] = useState("");
     const fileInput =useRef();
 
     useEffect(() => {
@@ -25,7 +25,6 @@ const Home = ({userObj})=>{
              ...doc.data(),
          }));
          setNweets(nweetArr);
-         console.log(nweetArr);
      });
      return () => {
         unsubscribe();
@@ -35,15 +34,28 @@ const Home = ({userObj})=>{
 
     const onSubmit =async (e) => {
         e.preventDefault();
-        const fileRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
-        const response = await uploadString(fileRef, attachment, "data_url");
-        console.log(response);
-        // await addDoc(collection(dbService, "nweets"), {
-        // text:nweet,
-        // createdAt: serverTimestamp(),
-        // creatorId: userObj.uid,
-        // });
-        // setNweet("");
+        let attachmentUrl = "";
+        if(attachment != ""){
+            //참조경로
+            const attachmentRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
+           //참조경로로 파일 업로드 
+            const response = await uploadString(attachmentRef, attachment, "data_url");
+            //storage에 있는 파일 url로 다운로드 받기 ... await 빼면 오류난다. 
+            attachmentUrl =  await getDownloadURL(response.ref);  
+        }
+
+        //이미지랑 같이 트윗 없으면 ""로 삽입 
+        const nweetPosting = {
+            text:nweet,
+            createdAt: serverTimestamp(),
+            creatorId: userObj.uid,
+            attachmentUrl,
+        };
+
+         await addDoc(collection(dbService, "nweets"), nweetPosting);
+         setNweet("");
+         setAttachment("");
+         fileInput.current.value ="";
     };
 
 
@@ -59,20 +71,20 @@ const Home = ({userObj})=>{
         const theFile = files[0];
         const reader = new FileReader();
         reader.onloadend=(finishedEv)=>{
-            // const{currentTarget:{result}} = finishedEv;
-            // setAttachment(result);
-            setAttachment(finishedEv.currentTarget.result);
+            const{currentTarget:{result}} = finishedEv;
+            setAttachment(result);
+            // setAttachment(finishedEv.currentTarget.result);
         };
         reader.readAsDataURL(theFile);
     };
     
     const onClearAttachment = ()=>{
-        setAttachment(null);
+        setAttachment("");
         fileInput.current.value ="";
 
     }
 
-console.log(nweets);
+
     return (
         <div>
             <form onSubmit={onSubmit}>
