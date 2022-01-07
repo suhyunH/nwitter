@@ -16,7 +16,8 @@ function App() {
         setUserObj({
           displayName :user.displayName,
           uid:user.uid,
-          updateProfile:(args) =>updateProfile(user, { displayName: user.displayName }),
+          photoURL:user.photoURL,
+          updateProfile:(args) =>updateProfile(user, { displayName: user.displayName ,photoURL:user.photoURL }),
         });
        }else{
          setUserObj("");
@@ -32,6 +33,7 @@ function App() {
     setUserObj({
       displayName :user.displayName,
       uid:user.uid,
+      photoURL:user.photoURL,
       updateProfile:(args) =>user.updateProfile(args),
     });
   }
@@ -41,7 +43,7 @@ function App() {
   {init ? (<AppRouter refreshUser={refreshUser} isLoggedIn ={Boolean(userObj)} userObj={userObj}/>) : ("initializing...")}
 
 
-  <footer>&copy;{new Date().getFullYear()} Nwitter</footer>
+  <footer style={{textAlign: "center", marginTop:50}}>&copy;{new Date().getFullYear()} Nwitter</footer>
   </>
   );
 }

@@ -28,10 +28,11 @@ const Home = ({userObj})=>{
     }, [])
 
     return (
-        <div>
+
+        <div  className="container">
             <NweetFactory userObj={userObj}/>
 
-            <div>
+            <div style={{ marginTop: 30 }}>
                 {nweets.map((nweet) =>(
                     <Nweet key={nweet.id} nweetObj ={nweet} isOwner={nweet.creatorId ===userObj.uid}/>
                     )
@@ -39,6 +40,7 @@ const Home = ({userObj})=>{
             </div>
             
         </div>
+ 
 
     );
     };
