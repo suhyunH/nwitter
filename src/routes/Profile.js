@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 export default ({refreshUser, userObj})=>{
     const history = useHistory();
     const [newDisplayName, setNewtDisplayName] = useState(userObj.displayName);
-    const [img, setImg] = useState("");
+    const [img, setImg] = useState(userObj.photoURL);
 
     const onLogOutClick =()=>{
         authService.signOut();
@@ -55,15 +55,12 @@ export default ({refreshUser, userObj})=>{
             const imgRef = ref(storageService,'profilePictures/' + img.name );
             const response = await uploadString(imgRef, img, "data_url");
             imgUrl =  await getDownloadURL(response.ref);  
+        }
         
-        if(userObj.displayName !== newDisplayName){
-            await updateProfile(authService.currentUser,{displayName : newDisplayName, photoURL: imgUrl });
-        };
-        refreshUser();
-        setImg("");
-
+        await updateProfile(authService.currentUser,{displayName : newDisplayName, photoURL: imgUrl });
+        refreshUser();   
     }
-}
+
    
 
     const onClearNewPro = ()=>{
@@ -80,7 +77,7 @@ return (
         {img &&
                         <div className="factoryForm__attachment">
                         <img className="change_pic" src={img} style={{backgroundImage: img}} />
-                        <button className="change_pic_Clear" onClick={onClearNewPro}><span>Remove</span><FontAwesomeIcon icon={faTimes} /></button>
+                        <button className="change_pic_Clear" onClick={onClearNewPro}><span>Remove </span><FontAwesomeIcon icon={faTimes} /></button>
                         </div>
         } 
         <input  className="formInput" onChange={onChange} type="text" placeholder='Display name' value={newDisplayName} autoFocus />
