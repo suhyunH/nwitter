@@ -35,7 +35,7 @@ const Home = ({userObj})=>{
     const onSubmit =async (e) => {
         e.preventDefault();
         let attachmentUrl = "";
-        if(attachment != ""){
+        if(attachment !== ""){
             //참조경로
             const attachmentRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
            //참조경로로 파일 업로드 
