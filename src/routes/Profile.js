@@ -52,7 +52,7 @@ export default ({refreshUser, userObj})=>{
         ev.preventDefault();
         let imgUrl = "";
         if(img !== ""){
-            const imgRef = ref(storageService,'profilePictures/' + img.name );
+            const imgRef = ref(storageService,`${userObj.uid}/${uuidv4()}` );
             const response = await uploadString(imgRef, img, "data_url");
             imgUrl =  await getDownloadURL(response.ref);  
         }
